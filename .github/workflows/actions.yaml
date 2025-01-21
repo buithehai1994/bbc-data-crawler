@@ -1,0 +1,40 @@
+name: Run web scraper
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'  # Runs every other hour
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Execute Python script
+        run: python main.py
+
+      - name: Commit changes
+        uses: buithehai1994/git-auto-commit-action@v4
+        with:
+          commit_message: Update filtered_articles.csv
+        id: auto-commit-action
+
+      - name: Push results to GitHub
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        uses: actions/checkout@v3
+        with:
+          repository: your-repo-name
+          path: filtered_articles.csv
+        run: git add filtered_articles.csv && git commit -m "Update filtered_articles.csv" && git push
