@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: install paccakge
-      run: python -m pip install -r .github/workflows/requirements.txt
+      run: python -m pip install -r bbc-data-crawler/.github/workflows/requirements.txt
     - name: Execute Python script
       run: python function.py
 
