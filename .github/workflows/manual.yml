@@ -20,8 +20,10 @@ jobs:
         fi
         for REQ_FILE in $REQ_FILES; do
           echo "Installing packages from $REQ_FILE"
-          pip install -r "$REQ_FILE" || {
+          pip install --no-cache-dir -r "$REQ_FILE" || {
             echo "Error installing packages from $REQ_FILE"
+            tail -n 20 "$REQ_FILE"
+            pip list
             exit 2
           }
         done
