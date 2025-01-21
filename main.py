@@ -41,7 +41,7 @@ def main():
         json_filename = 'processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d'))
         df_filtered.to_json(json_filename, orient='records', lines=True)
 
-        print(f"DataFrame dumped to filtered_articles.json")
+        print(f"DataFrame dumped to json")
 
         return df_filtered  # Return the filtered DataFrame
 
