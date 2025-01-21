@@ -17,11 +17,18 @@ jobs:
         pip install -r $(find . -name 'requirements.txt' -print -quit)
 
     - name: Execute Python scripts
-      run:
-        for script in $(find . -name '*.py'); do python "$script"; done
+      run: |
+        for script in $(find . -name '*.py'); do
+          python "$script"
+        done
 
     - name: Move processed file with proper naming
-      run: mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv || echo "No filtered_articles.csv found"
+      run: |
+        if [ -f "filtered_articles.csv" ]; then
+          mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
+        else
+          echo "No filtered_articles.csv found"
+        fi
 
     - name: Commit and push changes to repository
       run: |
