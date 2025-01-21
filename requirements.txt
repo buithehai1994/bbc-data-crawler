@@ -1,5 +1,5 @@
-beautifulsoup4
-pandas
+beautifulsoup4==4.9.3
+pandas==1.3.3
 numpy
 requests
 tqdm
