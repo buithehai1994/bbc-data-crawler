@@ -11,9 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: install paccakge
-      run: pip install -r ./bbc-data-crawler/.github/workflows/requirements.txt
-      
+    - name: Find and install requirements
+      run: |
+        for req_file in $(find . -name 'requirements.txt' -print -quit); do
+          pip install -r $req_file
+          break  # Exit after first successful `requirements.txt` installation
+        done
+
     - name: Execute Python script
       run: python function.py
 
