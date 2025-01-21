@@ -37,17 +37,13 @@ def main():
             print("No articles found for today")
             return None  # Return None if no articles are found
 
-        # Convert DataFrame to a dictionary where each key is the row index and the value is the article details
-        articles_dict = df_filtered.to_dict(orient='index')  # Convert DataFrame to dictionary
-
-        # Save the dictionary as a JSON file
+        # Save the filtered DataFrame as a JSON file
         json_filename = 'processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d'))
-        with open(json_filename, 'w') as json_file:
-            json.dump(articles_dict, json_file, indent=4)  # Save the dictionary to a JSON file
+        df_filtered.to_json(json_filename, orient='records', lines=True)
 
         print(f"DataFrame dumped to filtered_articles.json")
 
-        return articles_dict  # Return the dictionary of articles
+        return df_filtered  # Return the filtered DataFrame
 
     except Exception as e:
         print(f"An error occurred: {e}")
