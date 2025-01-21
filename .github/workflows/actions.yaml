@@ -1,13 +1,13 @@
-name: Run web scraper
+name: Save to today's folder with proper naming
 
 on:
   schedule:
-    - cron: '0 */2 * * *'  # Runs every other hour
+    - cron: '0 0 * * *'  # Run every day at midnight (UTC)
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -16,25 +16,14 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
+          
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           
       - name: Execute Python script
-        run: python main.py
+        run: python function.py
 
-      - name: Commit changes
-        uses: buithehai1994/git-auto-commit-action@v4
-        with:
-          commit_message: Update filtered_articles.csv
-        id: auto-commit-action
-
-      - name: Push results to GitHub
-        if: steps.auto-commit-action.outputs.changes_detected == 'true'
-        uses: actions/checkout@v3
-        with:
-          repository: your-repo-name
-          path: filtered_articles.csv
-        run: git add filtered_articles.csv && git commit -m "Update filtered_articles.csv" && git push
+      - name: Move output files to common folder
+        run: mv *.csv processed_files/
