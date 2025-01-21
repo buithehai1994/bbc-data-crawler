@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
     - name: Install Python packages from all requirements.txt files
       run: |
         python -m pip install --upgrade pip
@@ -28,24 +31,20 @@ jobs:
         wait
         echo "All Python scripts executed"
         
-    - name: Move processed file with proper naming
-      run: |
-        if [ -f "filtered_articles.csv" ]; then
-          mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
-          echo "Moved filtered_articles.csv to processed_files directory"
-        else
-          echo "No filtered_articles.csv found, skipping move"
-        fi
-  
     - name: Commit and push changes to repository
       run: |
-        if [ -f "processed_files/bbc_articles_$(date +\%Y-%m-%d).csv" ]; then
+        if [ -f "processed_files/bbc_articles_$(date +%Y-%m-%d).csv" ]; then
           git config --local user.email "haibt0206@gmail.com"
           git config --local user.name "thehaibui"
-          git add processed_files/
+          git add processed_files/*
           git commit -m "Save processed articles for $(date +%Y-%m-%d)"
-          git push
-          echo "Changes committed and pushed"
         else
-          echo "Processed CSV not found, skipping git commit and push"
-        fi
+          echo "No processed file found, skipping commit"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.MY_PAT_TOKEN }}
+        branch: ${{ github.ref_name }}
+        directory: processed_files
+        force: true
