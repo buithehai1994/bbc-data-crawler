@@ -14,21 +14,19 @@ jobs:
     - name: Install Python packages
       run: |
         python -m pip install --upgrade pip
-        pip install -r ./bbc-data-crawler/.github/workflows/requirements.txt
+        pip install -r $(find . -name 'requirements.txt' -print -quit)
 
-    - name: Execute Python script
-      run: python main.py
+    - name: Execute Python scripts
+      run:
+        for script in $(find . -name '*.py'); do python "$script"; done
 
-    - name: Check if the filtered articles file exists
+    - name: Move processed file with proper naming
+      run: mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv || echo "No filtered_articles.csv found"
+
+    - name: Commit and push changes to repository
       run: |
-        if [ -f filtered_articles.csv ]; then
-          mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
-        else
-          echo "Error: filtered_articles.csv does not exist."
+        if [ -f "processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv" ]; then
+          git add processed_files/
+          git commit -m "Save processed articles for $(date +%Y-%m-%d)"
+          git push
         fi
-
-    - name: Commit changes to repository
-      uses: actions/checkout@v2  # Ensure code is checked out first
-      - uses: ./.github/actions/bbc-data-crawler  # Path to your custom GitHub Action
-        with:
-          commit_message: "Save processed articles for $(date +%Y-%m-%d)"
