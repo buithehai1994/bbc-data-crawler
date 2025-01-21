@@ -2,7 +2,7 @@ name: Save to today's folder with proper naming
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run every day at midnight (UTC)
+    - cron: '38 9 * * *'  # Run at 9:36 AM every day (UTC)
 
 jobs:
   build:
