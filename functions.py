@@ -1,35 +1,10 @@
 import pandas as pd
-import pytz
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
 from urllib.parse import urlparse
-import requests
+from datetime import datetime
+from tqdm import tqdm
 import json
-
-def get_source_name(url):
-    domain = urlparse(url).netloc
-    source = domain.replace('www.', '').split('.')[0]
-    return source
-
-def parser_items_rss(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'xml')
-    items = soup.find_all('item')
-    source = get_source_name(url)
-
-    lista_items = []
-    for item in items:
-        row = {
-            "title": item.find('title').text if item.find('title') else None,
-            "description": item.find('description').text if item.find('description') else None,
-            "url": item.find('link').text if item.find('link') else None,
-            "pubDate": item.find('pubDate').text if item.find('pubDate') else None,
-            "source": source
-        }
-        lista_items.append(row)
-
-    return lista_items
 
 class WebPageExtractor:
     def __init__(self, url):
@@ -97,3 +72,104 @@ class WebPageExtractor:
             article_content = '\n'.join([p.get_text(strip=True) for p in paragraphs])
             return article_content if article_content else "No content found."
         return "Soup object not initialized. Call fetch_page() first."
+
+class RSSFeedExtractor:
+    def __init__(self, rss_urls):
+        self.rss_urls = rss_urls
+        self.df = None
+
+    def get_source_name(self, url):
+        domain = urlparse(url).netloc
+        source = domain.replace('www.', '').split('.')[0]
+        return source
+
+    def parser_items_rss(self, url):
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'xml')
+        items = soup.find_all('item')
+        source = self.get_source_name(url)
+
+        lista_items = []
+        for item in items:
+            row = {
+                "title": item.find('title').text if item.find('title') else None,
+                "description": item.find('description').text if item.find('description') else None,
+                "url": item.find('link').text if item.find('link') else None,
+                "pubDate": item.find('pubDate').text if item.find('pubDate') else None,
+                "source": source
+            }
+            lista_items.append(row)
+
+        return lista_items
+
+    def fetch_rss_feeds(self):
+        datos = []
+        for url in self.rss_urls:
+            datos.extend(self.parser_items_rss(url))
+        
+        self.df = pd.DataFrame(datos)
+        self.df = self.df.drop(['pubDate'], axis=1)
+        self.df["type"] = self.df["url"].str.extract(r"https://www\.bbc\.com/news/([^/]+)/")
+        self.df = self.df[self.df['type'] == 'articles']
+        return self.df
+
+class WebPageMetadataExtractor:
+    def __init__(self, df):
+        self.df = df
+
+    def extract_webpage_info(self, row):
+        url = row['url']
+        extractor = WebPageExtractor(url)
+        
+        # Fetch page and extract metadata
+        try:
+            extractor.fetch_page()
+            extractor.extract_json_metadata()
+            return {
+                'Author': extractor.extract_author(),
+                'Date Published': extractor.extract_date(),
+                'Headline': extractor.extract_headline(),
+                'Content': extractor.extract_content(),
+            }
+        except Exception as e:
+            print(f"Error processing URL {url}: {e}")
+            return {
+                'Author': None,
+                'Date Published': None,
+                'Headline': None,
+                'Content': None,
+            }
+
+    def fetch_webpage_metadata(self):
+        # Use tqdm for progress bar during extraction
+        tqdm.pandas()
+        extracted_data = self.df.progress_apply(self.extract_webpage_info, axis=1, result_type='expand')
+        return pd.concat([self.df, extracted_data], axis=1)
+
+class FilteredArticles:
+    def __init__(self, rss_urls):
+        self.rss_extractor = RSSFeedExtractor(rss_urls)
+        self.metadata_extractor = None
+        self.df = None
+
+    def fetch_rss_articles(self):
+        # Fetch RSS feeds and parse items
+        self.df = self.rss_extractor.fetch_rss_feeds()
+        return self.df
+
+    def fetch_webpage_metadata(self):
+        # Fetch metadata for the articles fetched from RSS
+        self.metadata_extractor = WebPageMetadataExtractor(self.df)
+        self.df = self.metadata_extractor.fetch_webpage_metadata()
+        return self.df
+
+    def filter_by_date(self):
+        # Convert the "Date Published" column to datetime
+        self.df['Date Published'] = pd.to_datetime(self.df['Date Published'])
+
+        # Get today's date
+        today = datetime.now().date()
+
+        # Filter articles published today
+        filtered_df = self.df[self.df['Date Published'].dt.date == today]
+        return filtered_df
