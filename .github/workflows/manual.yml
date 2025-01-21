@@ -11,15 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Find and install requirements
+    - name: Find and install requirements or other .txt files
       run: |
-        for req_file in $(find . -name 'requirements.txt' -print -quit); do
+        for req_file in $(find . -name 'requirements.txt' -o -name '*.txt' -print -quit); do
           pip install -r $req_file
-          break  # Exit after first successful `requirements.txt` installation
+          break  # Exit after first successful `requirements.txt` installation or any `.txt` file
         done
 
-    - name: Execute Python script
-      run: python function.py
+    - name: Find and run the Python script
+      run: |
+        for script in $(find . -name '*.py' -print -quit); do
+          python $script
+          break  # Exit after first successful `.py` file is run
+        done
 
     - name: Move processed file with proper naming
       run: mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
