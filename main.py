@@ -36,12 +36,13 @@ def main():
         # Save the filtered DataFrame as a JSON file to be pushed to GitHub
         file_path = 'processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d'))
         
-        # Save the filtered DataFrame as a CSV or other formats to be pushed to GitHub
-        dict_filtered.to_json(file_path, orient='records', indent=4, force_ascii=False)
+       # Save the filtered DataFrame as a JSON file
+        with open(file_path, 'w') as json_file:
+            json.dump(dict_filtered, json_file, indent=4, ensure_ascii=False)
 
         print(f"DataFrame dumped to dict_filtered.json")
 
-        return dict_filtered  # Return the filtered dicitonary
+        return dict_filtered  # Return the dictionary
 
     except Exception as e:
         print(f"An error occurred: {e}")
