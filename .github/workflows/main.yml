@@ -10,10 +10,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: buithehai1994/bbc-data-crawler
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: buithehai1994/bbc-data-crawler
         with:
           python-version: '3.9'
           
