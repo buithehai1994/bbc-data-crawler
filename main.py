@@ -1,4 +1,5 @@
 from functions import FilteredArticles
+import pandas as pd
 
 # RSS feed URLs
 world_news = [
