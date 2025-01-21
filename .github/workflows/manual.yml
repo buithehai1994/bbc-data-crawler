@@ -22,7 +22,7 @@ jobs:
     - name: Execute Python scripts
       run: |
         echo "Starting Python scripts execution"
-        for script in $(find . -name '*.py'); do
+        for script in $(find . -name 'main.py'); do
           python "$script" &
         done
         wait
