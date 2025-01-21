@@ -37,10 +37,11 @@ def main():
             print("No articles found for today")
             return None  # Return None if no articles are found
 
-        # Save the filtered DataFrame as a CSV or other formats to be pushed to GitHub
-        df_filtered.to_csv('processed_files/bbc_articles_{}.csv'.format(datetime.today().strftime('%Y-%m-%d')), index=False)
+        # Save the filtered DataFrame as a JSON file
+        json_filename = 'processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d'))
+        df_filtered.to_json(json_filename, orient='records', lines=True)
 
-        print(f"DataFrame dumped to filtered_articles.csv")
+        print(f"DataFrame dumped to filtered_articles.json")
 
         return df_filtered  # Return the filtered DataFrame
 
