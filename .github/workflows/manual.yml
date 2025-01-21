@@ -15,14 +15,13 @@ jobs:
       run: |
         for req_file in $(find . -name 'requirements.txt' -o -name '*.txt' -print -quit); do
           pip install -r $req_file
-          break  # Exit after first successful `requirements.txt` installation or any `.txt` file
+          break  # Exit after first successful `requirements.txt` or `.txt` installation
         done
 
-    - name: Find and run the Python script
+    - name: Run all Python scripts
       run: |
-        for script in $(find . -name '*.py' -print -quit); do
+        for script in $(find . -name '*.py'); do
           python $script
-          break  # Exit after first successful `.py` file is run
         done
 
     - name: Move processed file with proper naming
