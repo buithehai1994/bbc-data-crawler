@@ -6,7 +6,6 @@ on:
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  # This workflow contains a single job called "python_workflow"
   python_workflow:
     runs-on: ubuntu-latest
 
@@ -18,14 +17,16 @@ jobs:
 
     - name: Execute Python scripts
       run: |
+        echo "Starting Python scripts execution"
         for script in $(find . -name '*.py'); do
-          python "$script"
+          python "$script" &
         done
+        wait
+        echo "All Python scripts executed"
 
     - name: Wait for filtered_articles.csv to be generated
       id: check_csv
       run: |
-        # Wait for the file to be created
         for i in {1..10}; do
           if [ -f "filtered_articles.csv" ]; then
             echo "filtered_articles.csv is ready"
@@ -35,19 +36,27 @@ jobs:
             sleep 60
           fi
         done
+        if [ ! -f "filtered_articles.csv" ]; then
+          echo "Error: filtered_articles.csv was not generated after 10 attempts"
+          exit 1
+        fi
 
     - name: Move processed file with proper naming
       run: |
         if [ -f "filtered_articles.csv" ]; then
           mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
+          echo "Moved filtered_articles.csv to processed_files directory"
         else
-          echo "No filtered_articles.csv found"
+          echo "No filtered_articles.csv found, skipping move"
         fi
 
     - name: Commit and push changes to repository
       run: |
-        if [ -f "processed_files/bbc_articles_$(date +%Y-%m-\%d).csv" ]; then
+        if [ -f "processed_files/bbc_articles_$(date +\%Y-%m-%d).csv" ]; then
           git add processed_files/
           git commit -m "Save processed articles for $(date +%Y-%m-%d)"
           git push
+          echo "Changes committed and pushed"
+        else
+          echo "Processed CSV not found, skipping git commit and push"
         fi
