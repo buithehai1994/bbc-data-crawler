@@ -22,6 +22,20 @@ jobs:
           python "$script"
         done
 
+    - name: Wait for filtered_articles.csv to be generated
+      id: check_csv
+      run: |
+        # Wait for the file to be created
+        for i in {1..10}; do
+          if [ -f "filtered_articles.csv" ]; then
+            echo "filtered_articles.csv is ready"
+            break
+          else
+            echo "Waiting for filtered_articles.csv to be generated... ($i)"
+            sleep 60
+          fi
+        done
+
     - name: Move processed file with proper naming
       run: |
         if [ -f "filtered_articles.csv" ]; then
@@ -32,7 +46,7 @@ jobs:
 
     - name: Commit and push changes to repository
       run: |
-        if [ -f "processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv" ]; then
+        if [ -f "processed_files/bbc_articles_$(date +%Y-%m-\%d).csv" ]; then
           git add processed_files/
           git commit -m "Save processed articles for $(date +%Y-%m-%d)"
           git push
