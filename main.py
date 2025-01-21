@@ -31,6 +31,8 @@ df_metadata = filtered_articles.fetch_webpage_metadata()
 # Filter articles published today
 df_filtered = filtered_articles.filter_by_date()
 
+print("df generated succesfully")
+
 # Save the filtered DataFrame as a CSV or other formats to be pushed to GitHub
 df_filtered.to_csv('filtered_articles.csv', index=False)
 
