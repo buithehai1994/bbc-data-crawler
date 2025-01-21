@@ -2,7 +2,7 @@ name: Save to today's folder with proper naming
 
 on:
   schedule:
-    - cron: '38 9 * * *'  # Run at 9:36 AM every day (UTC)
+    - cron: '46 9 * * *'  # Run at 9:36 AM every day (UTC)
 
 jobs:
   build:
@@ -29,6 +29,6 @@ jobs:
         run: mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
         
       - name: Commit changes to repository
-        uses: buithehai1994/git-auto-commit-action@v4
+        uses: buithehai1994/bbc-data-crawler
         with:
           commit_message: "Save processed articles for `date +%Y-%m-%d`"
