@@ -10,10 +10,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: buithehai1994/bbc-data-crawler
+        uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
           
@@ -27,3 +27,8 @@ jobs:
 
       - name: Move processed file with proper naming
         run: mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
+        
+      - name: Commit changes to repository
+        uses: buithehai1994/git-auto-commit-action@v4
+        with:
+          commit_message: "Save processed articles for $(date +\%Y-%m-%d)"
