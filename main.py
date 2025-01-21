@@ -1,5 +1,12 @@
 from functions import FilteredArticles
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+from datetime import datetime
+from tqdm import tqdm
+import json
+
 
 # RSS feed URLs
 world_news = [
