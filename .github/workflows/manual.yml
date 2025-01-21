@@ -2,7 +2,7 @@ name: Python Workflow
 
 on:
   schedule:
-    - cron: "12 10 * * *" # Runs every day at 10:06 UTC
+    - cron: "14 10 * * *" # Runs every day at 10:06 UTC
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
@@ -15,7 +15,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
     - name: Execute Python script
       run: python function.py
 
@@ -24,6 +23,6 @@ jobs:
 
     - name: Commit changes to repository
       uses: actions/checkout@v2  # Ensure code is checked out first
-      - uses: ./.github/actions/bbc-data-crawler  # Path to your custom GitHub Action
-        with:
-          commit_message: "Save processed articles for $(date +%Y-%m-%d)"
+    - uses: ./.github/actions/bbc-data-crawler  # Path to your custom GitHub Action
+      with:
+        commit_message: "Save processed articles for $(date +%Y-%m-%d)"
