@@ -25,5 +25,5 @@ jobs:
       - name: Execute Python script
         run: python function.py
 
-      - name: Move output files to common folder
-        run: mv *.csv processed_files/
+      - name: Move processed file with proper naming
+        run: mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d)/bbc_articles_$(date +\%Y-\%m-\%d).csv
