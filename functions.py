@@ -172,4 +172,6 @@ class FilteredArticles:
 
         # Filter articles published today
         filtered_df = self.df[self.df['Date Published'].dt.date == today]
-        return filtered_df
+        # Convert dataframe to dictionary
+        data_dict = filtered_df.to_dict(orient='records') 
+        return data_dict
