@@ -31,18 +31,14 @@ def main():
         df_metadata = filtered_articles.fetch_webpage_metadata()
 
         # Filter articles published today
-        df_filtered = filtered_articles.filter_by_date()
-
-        if df_filtered.empty:
-            print("No articles found for today")
-            return None  # Return None if no articles are found
+        dict_filtered = filtered_articles.filter_by_date()
 
         # Save the filtered DataFrame as a CSV or other formats to be pushed to GitHub
-        df_filtered.to_csv('processed_files/bbc_articles_{}.csv'.format(datetime.today().strftime('%Y-%m-%d')), index=False)
+        dict_filtered.to_csv('processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d')), index=False)
 
-        print(f"DataFrame dumped to filtered_articles.csv")
+        print(f"DataFrame dumped to dict_filtered.json")
 
-        return df_filtered  # Return the filtered DataFrame
+        return dict_filtered  # Return the filtered dicitonary
 
     except Exception as e:
         print(f"An error occurred: {e}")
