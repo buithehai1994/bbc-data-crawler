@@ -31,4 +31,4 @@ jobs:
       - name: Commit changes to repository
         uses: buithehai1994/git-auto-commit-action@v4
         with:
-          commit_message: "Save processed articles for $(date +\%Y-%m-%d)"
+          commit_message: "Save processed articles for `date +%Y-%m-%d`"
