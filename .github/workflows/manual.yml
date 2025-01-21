@@ -1,0 +1,28 @@
+name: Python Workflow
+
+on:
+  schedule:
+    - cron: "06 10 * * *" # Runs every day at 10:06 UTC
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  # This workflow contains a single job called "python_workflow"
+  python_workflow:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install Python packages
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Execute Python script
+      run: python function.py
+
+    - name: Move processed file with proper naming
+      run: mv filtered_articles.csv processed_files/bbc_articles_$(date +\%Y-\%m-\%d).csv
+
+    - name: Commit changes to repository
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "Save processed articles for $(date +%Y-%m-%d)"
