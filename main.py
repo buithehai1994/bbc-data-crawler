@@ -25,3 +25,5 @@ df_filtered = filtered_articles.filter_by_date()
 
 # Save the filtered DataFrame as a CSV or other formats to be pushed to GitHub
 df_filtered.to_csv('filtered_articles.csv', index=False)
+
+print(f"DataFrame dumped to filtered_articles")
