@@ -83,7 +83,7 @@ class RSSFeedExtractor:
         source = domain.replace('www.', '').split('.')[0]
         return source
 
-    def parser_items_rss(self, url):
+    def parser_items_rss(self, url, category):
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'xml')
         items = soup.find_all('item')
@@ -96,11 +96,23 @@ class RSSFeedExtractor:
                 "description": item.find('description').text if item.find('description') else None,
                 "url": item.find('link').text if item.find('link') else None,
                 "pubDate": item.find('pubDate').text if item.find('pubDate') else None,
-                "source": source
+                "source": source,
+                "category": category  # Add the category from the dictionary
             }
             lista_items.append(row)
 
         return lista_items
+
+    def fetch_rss_feeds(self):
+        datos = []
+        for category, url in self.rss_urls.items():
+            datos.extend(self.parser_items_rss(url, category))
+        
+        self.df = pd.DataFrame(datos)
+        self.df = self.df.drop(['pubDate'], axis=1)
+        self.df["type"] = self.df["url"].str.extract(r"https://www\.bbc\.com/news/([^/]+)/")
+        self.df = self.df[self.df['type'] == 'articles']
+        return self.df
 
     def fetch_rss_feeds(self):
         datos = []
