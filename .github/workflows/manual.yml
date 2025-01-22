@@ -33,7 +33,7 @@ jobs:
         
     - name: Commit and push changes to repository
       run: |
-        if [ -f "processed_files/bbc_articles_$(date +%Y-%m-%d).json" ]; then
+        if [ -f 'processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d'))]; then
           git config --local user.email "haibt0206@gmail.com"
           git config --local user.name "thehaibui"
           git add processed_files/*
