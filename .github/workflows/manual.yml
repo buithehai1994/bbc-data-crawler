@@ -35,7 +35,7 @@ jobs:
       run: |
         FILE_PATH="processed_files/bbc_articles_$(date +%Y-%m-%d).json"
         
-        if [ -f "$FILE" ]; then
+        if [ -f "$FILE_PATH" ]; then
           # Configure Git with your email and username
           git config --local user.email "haibt0206@gmail.com"
           git config --local user.name "thehaibui"
@@ -52,7 +52,7 @@ jobs:
           echo "No processed file found for today, skipping commit"
         fi
         
-    - name: Push changes
+    - name: Push changes to GitHub
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.MY_PAT_TOKEN }}
