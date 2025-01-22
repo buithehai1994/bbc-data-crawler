@@ -97,7 +97,7 @@ class RSSFeedExtractor:
 
         return lista_items
 
-    def fetch_rss_feeds(self):
+    def fetch_rss_articles(self):
         datos = []
         for url in self.rss_urls:
             datos.extend(self.parser_items_rss(url))
