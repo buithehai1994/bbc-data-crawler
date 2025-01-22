@@ -174,7 +174,7 @@ class FilteredArticles:
         filtered_df = self.df[self.df['Date Published'].dt.date == today]
         return filtered_df
 
-    @static_method
+    @staticmethod
     def convert_to_json(df,file_path):
         """
         Save the dataframe as a JSON file.
