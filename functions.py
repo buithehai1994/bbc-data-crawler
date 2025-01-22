@@ -114,17 +114,6 @@ class RSSFeedExtractor:
         self.df = self.df[self.df['type'] == 'articles']
         return self.df
 
-    def fetch_rss_feeds(self):
-        datos = []
-        for url in self.rss_urls:
-            datos.extend(self.parser_items_rss(url))
-        
-        self.df = pd.DataFrame(datos)
-        self.df = self.df.drop(['pubDate'], axis=1)
-        self.df["type"] = self.df["url"].str.extract(r"https://www\.bbc\.com/news/([^/]+)/")
-        self.df = self.df[self.df['type'] == 'articles']
-        return self.df
-
 class WebPageMetadataExtractor:
     def __init__(self, df):
         self.df = df
