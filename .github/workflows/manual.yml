@@ -39,6 +39,9 @@ jobs:
           # Configure Git with your email and username
           git config --local user.email "haibt0206@gmail.com"
           git config --local user.name "thehaibui"
+
+          # Pull the latest changes from the remote
+          git pull origin main
           
           # Stage all changes in the processed_files directory
           git add processed_files/*
