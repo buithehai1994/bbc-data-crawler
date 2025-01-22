@@ -31,18 +31,19 @@ def main():
         df_metadata = filtered_articles.fetch_webpage_metadata()
 
         # Filter articles published today
-        dict_filtered = filtered_articles.filter_by_date()
+        df_filtered = filtered_articles.filter_by_date()
 
         # Save the filtered DataFrame as a JSON file to be pushed to GitHub
-        file_path = 'processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d'))
+        file_path = f'processed_files/bbc_articles_{datetime.today().strftime("%Y-%m-%d")}.json'
+        result_dict = filtered_articles.convert_to_json(df_filtered, file_path)
         
        # Save the filtered DataFrame as a JSON file
         with open(file_path, 'w') as json_file:
-            json.dump(dict_filtered, json_file, indent=4, ensure_ascii=False)
+            json.dump(result_dict, json_file, indent=4, ensure_ascii=False)
 
         print(f"DataFrame dumped to dict_filtered.json")
 
-        return dict_filtered  # Return the dictionary
+        return result_dict  # Return the dictionary
 
     except Exception as e:
         print(f"An error occurred: {e}")
