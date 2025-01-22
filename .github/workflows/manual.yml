@@ -33,7 +33,7 @@ jobs:
       
     - name: Commit and push changes to repository
       run: |
-        FILE="processed_files/bbc_articles_$(date +%Y-%m-%d).json"
+        FILE_PATH="processed_files/bbc_articles_{}.json".format($(date +%Y-%m-%d))
         
         if [ -f "$FILE" ]; then
           # Configure Git with your email and username
