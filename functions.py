@@ -173,3 +173,21 @@ class FilteredArticles:
         # Filter articles published today
         filtered_df = self.df[self.df['Date Published'].dt.date == today]
         return filtered_df
+
+    @static_method
+    def convert_to_json(df,file_path):
+        """
+        Save the dataframe as a JSON file.
+        :param file_path: Path to the output JSON file.
+        """
+        try:
+            # Convert dataframe to dictionary
+            data_dict = df.to_dict(orient='records')
+
+            # Save the dictionary as a JSON file
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(data_dict, f, ensure_ascii=False, indent=4)
+
+            print(f"Data successfully saved to {file_path}")
+        except Exception as e:
+            print(f"Failed to save data as JSON: {e}")
