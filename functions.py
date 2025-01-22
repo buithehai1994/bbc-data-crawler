@@ -1,10 +1,10 @@
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from datetime import datetime
-import json
 from tqdm import tqdm
-import pandas as pd
+import json
 
 class WebPageExtractor:
     def __init__(self, url):
@@ -21,6 +21,7 @@ class WebPageExtractor:
             print("Page fetched successfully.")
         except requests.RequestException as e:
             print(f"Failed to fetch page: {e}")
+            self.soup = None
 
     def extract_json_metadata(self):
         """Extracts JSON metadata from the <script> tag with type 'application/ld+json'."""
@@ -32,6 +33,9 @@ class WebPageExtractor:
                     print("JSON metadata extracted successfully.")
                 except json.JSONDecodeError as e:
                     print(f"Failed to parse JSON metadata: {e}")
+                    self.json_data = None
+            else:
+                print("No JSON metadata found.")
         else:
             print("Soup object not initialized. Call fetch_page() first.")
 
@@ -72,6 +76,7 @@ class WebPageExtractor:
 class RSSFeedExtractor:
     def __init__(self, rss_urls):
         self.rss_urls = rss_urls
+        self.df = None
 
     def get_source_name(self, url):
         domain = urlparse(url).netloc
@@ -97,19 +102,23 @@ class RSSFeedExtractor:
 
         return lista_items
 
-    def fetch_rss_articles(self):
+    def fetch_rss_feeds(self):
         datos = []
         for url in self.rss_urls:
             datos.extend(self.parser_items_rss(url))
         
-        return datos
+        self.df = pd.DataFrame(datos)
+        self.df = self.df.drop(['pubDate'], axis=1)
+        self.df["type"] = self.df["url"].str.extract(r"https://www\.bbc\.com/news/([^/]+)/")
+        self.df = self.df[self.df['type'] == 'articles']
+        return self.df
 
 class WebPageMetadataExtractor:
-    def __init__(self, dict_list):
-        self.dict_list = dict_list
+    def __init__(self, df):
+        self.df = df
 
-    def extract_webpage_info(self, item):
-        url = item['url']
+    def extract_webpage_info(self, row):
+        url = row['url']
         extractor = WebPageExtractor(url)
         
         # Fetch page and extract metadata
@@ -133,29 +142,34 @@ class WebPageMetadataExtractor:
 
     def fetch_webpage_metadata(self):
         # Use tqdm for progress bar during extraction
-        extracted_data = [self.extract_webpage_info(item) for item in tqdm(self.dict_list)]
-        return extracted_data
+        tqdm.pandas()
+        extracted_data = self.df.progress_apply(self.extract_webpage_info, axis=1, result_type='expand')
+        return pd.concat([self.df, extracted_data], axis=1)
 
 class FilteredArticles:
-    def __init__(self, dict_list):
-        self.dict_list = dict_list
+    def __init__(self, rss_urls):
+        self.rss_extractor = RSSFeedExtractor(rss_urls)
         self.metadata_extractor = None
+        self.df = None
+
+    def fetch_rss_articles(self):
+        # Fetch RSS feeds and parse items
+        self.df = self.rss_extractor.fetch_rss_feeds()
+        return self.df
 
     def fetch_webpage_metadata(self):
-        # Fetch metadata for the articles
-        self.metadata_extractor = WebPageMetadataExtractor(self.dict_list)
-        self.dict_list = self.metadata_extractor.fetch_webpage_metadata()
-        return self.dict_list
+        # Fetch metadata for the articles fetched from RSS
+        self.metadata_extractor = WebPageMetadataExtractor(self.df)
+        self.df = self.metadata_extractor.fetch_webpage_metadata()
+        return self.df
 
-    def filter_by_date(self, data_dict):
-        # Convert the "Date Published" field to datetime
-        for item in data_dict:
-            item['Date Published'] = pd.to_datetime(item['Date Published'])
+    def filter_by_date(self):
+        # Convert the "Date Published" column to datetime
+        self.df['Date Published'] = pd.to_datetime(self.df['Date Published'])
 
         # Get today's date
         today = datetime.now().date()
 
         # Filter articles published today
-        filtered_data = [item for item in data_dict if item['Date Published'].dt.date == today]
-        
-        return filtered_data  # Return the filtered list of dictionaries directly
+        filtered_df = self.df[self.df['Date Published'].dt.date == today]
+        return filtered_df
