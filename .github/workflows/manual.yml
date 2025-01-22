@@ -30,18 +30,28 @@ jobs:
         done
         wait
         echo "All Python scripts executed"
-        
+      
     - name: Commit and push changes to repository
       run: |
-        if [ -f 'processed_files/bbc_articles_{}.json'.format(datetime.today().strftime('%Y-%m-%d'))]; then
+        FILE="processed_files/bbc_articles_$(date +%Y-%m-%d).json"
+        
+        if [ -f "$FILE" ]; then
+          # Configure Git with your email and username
           git config --local user.email "haibt0206@gmail.com"
           git config --local user.name "thehaibui"
+          
+          # Stage all changes in the processed_files directory
           git add processed_files/*
+          
+          # Commit changes with a message including today's date
           git commit -m "Save processed articles for $(date +%Y-%m-%d)"
+          
+          # Push changes to the remote repository
+          git push
         else
-          echo "No processed file found, skipping commit"
+          echo "No processed file found for today, skipping commit"
         fi
-
+        
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
