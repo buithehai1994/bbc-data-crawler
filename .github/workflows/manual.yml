@@ -33,7 +33,7 @@ jobs:
       
     - name: Commit and push changes to repository
       run: |
-        FILE_PATH="processed_files/bbc_articles_$(date +%Y-%m-%d).json"
+        FILE_PATH="processed_files/bbc_articles_$(date '+%Y-%m-%d').json"
         
         if [ -f "$FILE_PATH" ]; then
           # Configure Git with your email and username
@@ -44,7 +44,7 @@ jobs:
           git add processed_files/*
           
           # Commit changes with a message including today's date
-          git commit -m "Save processed articles for $(date +%Y-%m-%d)"
+          git commit -m "Save processed articles for $(date '+%Y-%m-%d')"
           
           # Push changes to the remote repository
           git push
