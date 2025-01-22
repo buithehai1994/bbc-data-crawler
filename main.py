@@ -37,12 +37,6 @@ def main():
         file_path = f'processed_files/bbc_articles_{datetime.today().strftime("%Y-%m-%d")}.json'
         result_dict = filtered_articles.convert_to_json(df_filtered, file_path)
         
-       # Save the filtered DataFrame as a JSON file
-        with open(file_path, 'w') as json_file:
-            json.dump(result_dict, json_file, indent=4, ensure_ascii=False)
-
-        print(f"DataFrame dumped to dict_filtered.json")
-
         return result_dict  # Return the dictionary
 
     except Exception as e:
