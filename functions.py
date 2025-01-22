@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from datetime import datetime
+from datetime import date
 from tqdm import tqdm
 import json
 
@@ -54,10 +55,10 @@ class WebPageExtractor:
         return "No JSON metadata found."
 
     def extract_date(self):
-        """Extracts the publication date from the JSON metadata."""
-        if self.json_data:
-            return self.json_data.get("datePublished", "No publication date found.")
-        return "No JSON metadata found."
+        if self.json_data:  # Check if the JSON data is not empty
+            return self.json_data.get("datePublished", date.today().strftime("%Y-%m-%d"))  # Return date if available, else today’s date
+        else:
+            return date.today().strftime("%Y-%m-%d")  # Return today's date if no data is found
 
     def extract_headline(self):
         """Extracts the headline from the JSON metadata."""
