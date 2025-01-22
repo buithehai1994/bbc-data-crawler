@@ -175,7 +175,7 @@ class FilteredArticles:
         return filtered_df
 
     @staticmethod
-    def convert_to_json(df,file_path):
+    def convert_to_json(df, file_path):
         """
         Save the dataframe as a JSON file.
         :param file_path: Path to the output JSON file.
@@ -183,11 +183,16 @@ class FilteredArticles:
         try:
             # Convert dataframe to dictionary
             data_dict = df.to_dict(orient='records')
-
+            
+            # Ensure Timestamp objects are converted to strings
+            for record in data_dict:
+                if 'Date Published' in record:
+                    record['Date Published'] = record['Date Published'].strftime('%Y-%m-%d %H:%M:%S')
+    
             # Save the dictionary as a JSON file
             with open(file_path, 'w', encoding='utf-8') as f:
                 json.dump(data_dict, f, ensure_ascii=False, indent=4)
-
+    
             print(f"Data successfully saved to {file_path}")
         except Exception as e:
             print(f"Failed to save data as JSON: {e}")
