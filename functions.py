@@ -3,7 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from datetime import datetime
-from datetime import date
 from tqdm import tqdm
 import json
 
@@ -55,10 +54,10 @@ class WebPageExtractor:
         return "No JSON metadata found."
 
     def extract_date(self):
-        if self.json_data:  # Check if the JSON data is not empty
-            return self.json_data.get("datePublished", date.today().strftime("%Y-%m-%d"))  # Return date if available, else today’s date
-        else:
-            return date.today().strftime("%Y-%m-%d")  # Return today's date if no data is found
+        """Extracts the publication date from the JSON metadata."""
+        if self.json_data:
+            return self.json_data.get("datePublished", "No publication date found.")
+        return "No JSON metadata found."
 
     def extract_headline(self):
         """Extracts the headline from the JSON metadata."""
@@ -104,25 +103,14 @@ class RSSFeedExtractor:
         return lista_items
 
     def fetch_rss_feeds(self):
-        # Dictionary mapping URL to type
-        url_type_mapping = {
-            'https://feeds.bbci.co.uk/news/business/rss.xml?edition=uk': 'business',
-            'https://feeds.bbci.co.uk/news/education/rss.xml?edition=uk': 'education',
-            'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml?edition=uk': 'entertainment',
-            'https://feeds.bbci.co.uk/news/health/rss.xml?edition=uk': 'health',
-            'https://feeds.bbci.co.uk/news/technology/rss.xml?edition=uk': 'technology',
-            'https://feeds.bbci.co.uk/news/world/rss.xml?edition=uk': 'world',
-            'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml?edition=uk': 'science'
-        }
-
         datos = []
         for url in self.rss_urls:
             datos.extend(self.parser_items_rss(url))
         
         self.df = pd.DataFrame(datos)
         self.df = self.df.drop(['pubDate'], axis=1)
-        self.df["type"] = self.df["url"].map(url_type_mapping)  # Manually map based on the URL
-
+        self.df["type"] = self.df["url"].str.extract(r"https://www\.bbc\.com/news/([^/]+)/")
+        self.df = self.df[self.df['type'] == 'articles']
         return self.df
 
 class WebPageMetadataExtractor:
