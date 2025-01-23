@@ -2,7 +2,7 @@ name: Python Workflow
 
 on:
   schedule:
-    - cron: "23 40 * * *" # Runs every day at 00:00 UTC
+    - cron: "23 40 * * *" # Runs every day at 23:40 UTC
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
