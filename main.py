@@ -22,6 +22,9 @@ filtered_articles = FilteredArticles(dict_news)
 
 def main():
     try:
+        # Calculate yesterday's date
+        yesterday = (datetime.now().date() - timedelta(days=1))
+
         # Fetch RSS articles
         df_articles = filtered_articles.fetch_rss_articles()
 
@@ -29,8 +32,7 @@ def main():
         df_metadata = filtered_articles.fetch_webpage_metadata()
 
         # Filter articles published yesterday
-        yesterday = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
-        df_filtered = filtered_articles.filter_by_date(date_filter=yesterday)
+        df_filtered = filtered_articles.filter_by_date()
 
         # Save the filtered DataFrame as a JSON file to be pushed to GitHub
         file_path = f'processed_files/bbc_articles_{yesterday}.json'
