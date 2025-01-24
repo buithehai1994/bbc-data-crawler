@@ -29,10 +29,13 @@ def main():
         
         # Fetch webpage metadata
         df_metadata = filtered_articles.fetch_webpage_metadata()
+
+        # Define date
+        yesterday = datetime.now().date() - timedelta(days=1)
         
         # Filter articles published yesterday
         df_filtered = filtered_articles.filter_by_date()
-
+        
         # Save the filtered DataFrame as a JSON file to be pushed to GitHub
         file_path = f'processed_files/bbc_articles_{yesterday}.json'
         result_dict = filtered_articles.convert_to_json(df_filtered, file_path)
