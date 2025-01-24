@@ -1,4 +1,4 @@
-from functions import FilteredArticles
+from functions import WebPageExtractor, RSSFeedExtractor, WebPageMetadataExtractor, FilteredArticles
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -9,28 +9,27 @@ import json
 
 
 # RSS feed URLs
-dict_news = {"business": 'https://feeds.bbci.co.uk/news/business/rss.xml?edition=uk',
-              "education":'https://feeds.bbci.co.uk/news/education/rss.xml?edition=uk',
-              "entertainment_and_arts": 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml?edition=uk',
-              "health": 'https://feeds.bbci.co.uk/news/health/rss.xml?edition=uk',
-              "technology": 'https://feeds.bbci.co.uk/news/technology/rss.xml?edition=uk',
-              "world":'https://feeds.bbci.co.uk/news/world/rss.xml?edition=uk',
-              "science_and_environment": 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml?edition=uk'}
+dict_news = {
+    "business": 'https://feeds.bbci.co.uk/news/business/rss.xml?edition=uk',
+    "education": 'https://feeds.bbci.co.uk/news/education/rss.xml?edition=uk',
+    "entertainment_and_arts": 'https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml?edition=uk',
+    "health": 'https://feeds.bbci.co.uk/news/health/rss.xml?edition=uk',
+    "technology": 'https://feeds.bbci.co.uk/news/technology/rss.xml?edition=uk',
+    "world": 'https://feeds.bbci.co.uk/news/world/rss.xml?edition=uk',
+    "science_and_environment": 'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml?edition=uk'
+}
 
-# Create the main class instance
-filtered_articles = FilteredArticles(dict_news)
+# Create the main class instance with correct RSS URLs
+filtered_articles = FilteredArticles(list(dict_news.values()))
 
 def main():
     try:
-        # Calculate yesterday's date
-        yesterday = (datetime.now().date() - timedelta(days=1))
-
-        # Fetch RSS articles
+       # Fetch RSS articles
         df_articles = filtered_articles.fetch_rss_articles()
-
+        
         # Fetch webpage metadata
         df_metadata = filtered_articles.fetch_webpage_metadata()
-
+        
         # Filter articles published yesterday
         df_filtered = filtered_articles.filter_by_date()
 
