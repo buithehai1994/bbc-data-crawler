@@ -168,11 +168,11 @@ class FilteredArticles:
         # Convert the "Date Published" column to datetime
         self.df['Date Published'] = pd.to_datetime(self.df['Date Published'])
 
-        # Get today's date
-        today = datetime.now().date()-1
+        # Get today's date minus 1 day
+        yesterday = (datetime.now().date() - timedelta(days=1))
 
-        # Filter articles published today
-        filtered_df = self.df[self.df['Date Published'].dt.date == today]
+        # Filter articles published yesterday
+        filtered_df = self.df[self.df['Date Published'].dt.date == yesterday]
         return filtered_df
 
     @staticmethod
