@@ -2,7 +2,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-from datetime import datetime
+from datetime import datetime, timedelta
 from tqdm import tqdm
 import json
 
@@ -83,7 +83,7 @@ class RSSFeedExtractor:
         source = domain.replace('www.', '').split('.')[0]
         return source
 
-    def parser_items_rss(self, url, category):
+    def parser_items_rss(self, url):
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'xml')
         items = soup.find_all('item')
@@ -96,8 +96,7 @@ class RSSFeedExtractor:
                 "description": item.find('description').text if item.find('description') else None,
                 "url": item.find('link').text if item.find('link') else None,
                 "pubDate": item.find('pubDate').text if item.find('pubDate') else None,
-                "source": source,
-                "category": category  # Add the category from the dictionary
+                "source": source
             }
             lista_items.append(row)
 
@@ -105,8 +104,8 @@ class RSSFeedExtractor:
 
     def fetch_rss_feeds(self):
         datos = []
-        for category, url in self.rss_urls.items():
-            datos.extend(self.parser_items_rss(url, category))
+        for url in self.rss_urls:
+            datos.extend(self.parser_items_rss(url))
         
         self.df = pd.DataFrame(datos)
         self.df = self.df.drop(['pubDate'], axis=1)
@@ -168,11 +167,12 @@ class FilteredArticles:
         # Convert the "Date Published" column to datetime
         self.df['Date Published'] = pd.to_datetime(self.df['Date Published'])
 
-        # Get today's date minus 1 day
-        yesterday = (datetime.now().date() - timedelta(days=1))
+        # Get today's date
+        # Get today's date and subtract one day
+        today = datetime.now().date() - timedelta(days=1)
 
-        # Filter articles published yesterday
-        filtered_df = self.df[self.df['Date Published'].dt.date == yesterday]
+        # Filter articles published today
+        filtered_df = self.df[self.df['Date Published'].dt.date == today]
         return filtered_df
 
     @staticmethod
@@ -196,4 +196,4 @@ class FilteredArticles:
     
             print(f"Data successfully saved to {file_path}")
         except Exception as e:
-            print(f"Failed to save data as JSON: {e}")
+            print(f"Failed to save data as JSON: {e}")  
