@@ -6,6 +6,10 @@ from datetime import datetime, timedelta
 from tqdm import tqdm
 import json
 
+import requests
+from bs4 import BeautifulSoup
+import json
+
 class WebPageExtractor:
     def __init__(self, url):
         self.url = url
@@ -73,6 +77,7 @@ class WebPageExtractor:
             return article_content if article_content else "No content found."
         return "Soup object not initialized. Call fetch_page() first."
 
+        
 class RSSFeedExtractor:
     def __init__(self, rss_urls):
         self.rss_urls = rss_urls
