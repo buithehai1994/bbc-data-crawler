@@ -174,10 +174,10 @@ class FilteredArticles:
 
         # Get today's date
         # Get today's date and subtract one day
-        today = datetime.now().date() - timedelta(days=1)
+        yesterday = datetime.now().date() - timedelta(days=1)
 
         # Filter articles published today
-        filtered_df = self.df[self.df['Date Published'].dt.date == today]
+        filtered_df = self.df[self.df['Date Published'].dt.date == yesterday]
         return filtered_df
 
     @staticmethod
