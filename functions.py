@@ -169,7 +169,7 @@ class FilteredArticles:
         self.df['Date Published'] = pd.to_datetime(self.df['Date Published'])
 
         # Get today's date
-        today = datetime.now().date()
+        today = datetime.now().date()-1
 
         # Filter articles published today
         filtered_df = self.df[self.df['Date Published'].dt.date == today]
